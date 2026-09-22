@@ -1,7 +1,13 @@
 import os, sys, csv
+from typing import List
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+import random
+import requests
+
 from utils.consoleMenu import InteractiveConsole
+
+url: str = 'https://opentdb.com/api.php?amount={0}'
 
 def read_psv() -> dict[int, str]:
   """
@@ -52,7 +58,7 @@ def _fact_format(num: int, fact: str) -> dict[str, int|str]:
 
   return {'number': num, 'text': fact}
 
-def trivia_fetch(num: int) -> dict[str, int|str]:
+def trivia_fetch(num: int, legacy: bool=False) -> dict[str, int|str]:
   """
   Obtiene el facto de un número dado.
 
@@ -63,14 +69,26 @@ def trivia_fetch(num: int) -> dict[str, int|str]:
     Un diccionario con el formato {'numero': `int`, 'text': `str`}.
   """
 
-  return _fact_format(num, read_psv()[num])
+  if legacy: return _fact_format(num, read_psv()[num])
 
-def main():
+  response = requests.get(url.format(num))
+  trivia = response.json()
+  return trivia
+
+def legacy_version() -> bool:
+  """
+    Permite realizar una trivia en consola, según a como comprendí
+    cuando no habían actualizado el laboratorio.
+    Honestamente, me daba pena tener que borrar mi trabajo y lo coloqué
+    como 'legado'
+
+    Returns:
+      Indica 'False' si ya se ha terminado la versión de legado.
+  """
+
   trivia = read_psv()
   running = True
-
   options = ['Buscar un facto', 'Decir un facto', 'Salir']
-
   while(running):
     option = InteractiveConsole.ask_menu(options, 0, 3)
 
@@ -78,7 +96,7 @@ def main():
       print('¿De qué número quieres saber el facto?')
       number = InteractiveConsole.ask_integer()
       fact = _fact_format(number, trivia[number])
-      print(fact['text'], '\n')
+      print(fact, '\n')
 
     elif option == 2:
       print('¿De qué número quieres escribir el facto?')
@@ -95,9 +113,88 @@ def main():
       print()
 
     else:
-      print(f'Gracias por los factos. Vuelve pronto')
+      print('Gracias por los factos')
       running = False
       save_psv(trivia)
+  return False
+
+def api_version() -> bool:
+  """
+  Permite realizar una trivia en consola, según los líneamientos
+  actualizados del laboratorio.
+
+  Returns:
+    Indica 'False' si ya se ha terminado la versión de api.
+  """
+
+  def __multiple(question: dict[str, str| List[str]]) -> None:
+    """
+    Permite responder una pregunta de opción múltiple.
+    """
+
+    print(question['question'])
+    incorrect_answers: List[str] = question['incorrect_answers']
+    position: int = random.randint(0, 3)
+    incorrect_answers.insert(position, question['correct_answer'])
+    answers: List[str] = incorrect_answers
+    option = InteractiveConsole.ask_menu(answers, 0, len(answers))
+
+    if position == option-1: print('Correcto')
+    else: print(f'Incorrecto. La respuesta es {question["correct_answer"]}')
+    print()
+
+  def __boolean(question: dict[str, str| List[str]]) -> None:
+    """
+    Permite responder una pregunta de sí o no.
+    """
+
+    yes = ['Cierto', 'Sí', 'S', 'Verdad', 'V', 'True', 'Yes', 'Y']
+    no = ['Falso', 'No', 'N', 'False', 'F']
+    option = InteractiveConsole.ask_yes_no(question['question'], yes, no)
+
+    if option == bool(question['correct_answer']): print('Correcto')
+    else: print('Incorrecto')
+    print()
+
+  running = True
+  options = ['Responder un quizz', 'Salir']
+  while(running):
+    option = InteractiveConsole.ask_menu(options, 0, 2)
+
+    if option == 1:
+      print('¿Cuántas preguntas quieres responder?')
+      number = InteractiveConsole.ask_integer(False)
+
+      trivia = trivia_fetch(number)
+      for i, question in enumerate(trivia['results']):
+        if question['type'] == 'multiple': __multiple(question)
+        else: __boolean(question)
+
+        if i+1 < number and not(InteractiveConsole.ask_yes_no(
+          f'¿Continuar? (Faltan {number-i-1})',
+          ['Sí', 'S', 'Yes', 'Y'], ['No', 'N'])
+        ): break
+    else:
+      running = False
+      print('Gracias por jugar')
+  return False
+
+def main():
+  running = True
+
+  print('Escoge que versión quieres usar')
+  options = [
+    'Versión de API (Después de la API)',
+    'Versión de legado (Antes de la API)', 'Salir'
+  ]
+  while(running):
+    option = InteractiveConsole.ask_menu(options, 0, 3)
+
+    if option == 1: running = api_version()
+    elif option == 2: running = legacy_version()
+    else:
+      print('Nos vemos!!!')
+      running = False
 
 if __name__=="__main__":
   main()
