@@ -13,7 +13,7 @@ async function askNumber(message) {
     if (Number.isNaN(number)) {
       console.log('Por favor, escribe un número válido.');
     }
-  } while (Number.isNaN(number));
+  } while(Number.isNaN(number));
 
   return number;
 }
@@ -28,8 +28,9 @@ async function askNumber(message) {
     number2 = temp;
   }
 
+  const NUMBER_ARRAY = [];
   console.log(`\nEl rango de números es [${number1},${number2}]`);
-  for (let i = number1; i <= number2; i++) {
+  for(let i = number1; i <= number2; i++) {
     let string = '';
 
     if (i % 3 === 0) string += 'Fizz';
@@ -37,7 +38,9 @@ async function askNumber(message) {
     if (i % 7 === 0) string += 'Woof';
 
     console.log(string || i);
+    NUMBER_ARRAY.push(i);
   }
 
+  console.log(NUMBER_ARRAY);
   rl.close();
 })();

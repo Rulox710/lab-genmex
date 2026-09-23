@@ -1,14 +1,3 @@
-// Refer to Task 7 in your Instructions to complete this task
-
-const buzzWords = [
-    "Fizz",
-    "Buzz",
-    "Woof",
-    "Bark",
-    "Awoo",
-    "Bang"
-  ];
-
 const readline = require('node:readline/promises');
 
 const rl = readline.createInterface({
@@ -24,7 +13,7 @@ async function askNumber(message) {
     if (Number.isNaN(number)) {
       console.log('Por favor, escribe un número válido.');
     }
-  } while (Number.isNaN(number));
+  } while(Number.isNaN(number));
 
   return number;
 }
@@ -39,9 +28,8 @@ async function askNumber(message) {
     number2 = temp;
   }
 
-  const array = []
   console.log(`\nEl rango de números es [${number1},${number2}]`);
-  for (let i = number1; i <= number2; i++) {
+  for(let i = number1; i <= number2; i++) {
     let string = '';
 
     if (i % 3 === 0) string += 'Fizz';
@@ -49,9 +37,7 @@ async function askNumber(message) {
     if (i % 7 === 0) string += 'Woof';
 
     console.log(string || i);
-    array.push(i);
   }
 
-  console.log(array)
   rl.close();
 })();
