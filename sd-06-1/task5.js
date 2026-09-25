@@ -19,10 +19,23 @@ function askString(message) {
 }
 
 const FRIEND_LIST = new FriendList();
-let number = askString('Ingrese cuantos amigos tiene');
-for(let i = 0; i < number; i++) {
-  let friend = askString(`Ingrese el nombre de su amigo #${i+1}`);
-  FRIEND_LIST.addFriend(friend);
+let number;
+
+if (process.argv.length >= 4) {
+  // Versión máquina
+  number = parseInt(process.argv[3]);
+
+  for (let i = 0; i < number; i++) {
+    FRIEND_LIST.addFriend(process.argv[4 + i]);
+  }
+} else {
+  // Versión usuario
+  number = askString('Ingrese cuantos amigos tiene');
+
+  for (let i = 0; i < number; i++) {
+    let friend = askString(`Ingrese el nombre de su amigo #${i + 1}`);
+    FRIEND_LIST.addFriend(friend);
+  }
 }
 FRIEND_LIST.printFriends();
 

@@ -82,7 +82,7 @@ def test_task_five():
         '5',
         '3',
         'Gigi',
-        'Sam',
+        'Sami',
         'Jack'
     ]
 

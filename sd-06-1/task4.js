@@ -11,8 +11,17 @@ function askString(message) {
   return prompt(`${message}: `);
 }
 
-let from = askString('¿De dónde viene?');
-let to = askString('¿A dónde va?');
+let from;
+let to;
+if (process.argv.length >= 5) {
+  // Ejecución con parámetros (pytest, por ejemplo)
+  from = process.argv[3];
+  to = process.argv[4];
+} else {
+  // Ejecución manual
+  from = askString('¿De dónde viene?');
+  to = askString('¿A dónde va?');
+}
 
 // Type your code above this line!
 

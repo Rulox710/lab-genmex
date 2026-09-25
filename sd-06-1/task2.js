@@ -10,8 +10,17 @@ function askString(message) {
   return prompt(`${message}: `);
 }
 
-let subject = askString('Ingrese su nombre');
-let message = askString('¿Cuál es su asunto?');
+let subject;
+let message;
+if (process.argv.length >= 5) {
+  // Ejecución con parámetros (pytest, por ejemplo)
+  subject = process.argv[3];
+  message = process.argv[4];
+} else {
+  // Ejecución manual
+  subject = prompt('Ingrese su nombre: ');
+  message = prompt('¿Cuál es su asunto?: ');
+}
 
 const newMail = new Mail(subject, message)
 
