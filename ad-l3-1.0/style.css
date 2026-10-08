@@ -1,0 +1,22 @@
+html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: gray;
+}
+
+h3 {
+  color: green;
+}
+
+.container__h3--blue {
+  color: blue;
+}
+
+#h3-red {
+  color: red;
+}
